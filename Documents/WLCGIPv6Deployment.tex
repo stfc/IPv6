@@ -1,0 +1,127 @@
+documentclass[11pt]{article}
+\begin{document}
+
+\title{WLCG IPv6 only CPU deployment strategy}
+\author{HEPiX IPv6 Working group}
+\date{\today}
+\maketitle
+
+\renewcommand{\abstractname}{Executive Summary}
+\begin{abstract}
+%With the continuing exhaustion of IPv4 addresses and the rising use of IPv6 across the globe it is important for the WLCG to have a plan to allow sites to migrate to IPv6.
+This document describes the Worldwide LHC Computing Grid's (WLCG) strategy to allow sites to provide IPv6 only CPU resources to the VOs.  
+
+
+\begin{itemize}
+\item Sites can provide IPv6 only CPU resources from April 2017 onwards.
+
+\item Sites will not be required to provide dual stack interfaces (e.g. CEs and Squids) for their CPU resources.
+
+\item The VO infrastructure (e.g. central services provided by VOs) must provide an equal quality of service to both IPv4 and IPv6 resources.
+
+\item An IPv6 only CPU resource will need access to (dual stack) storage.  Several VOs have federated data access models.  We need to provide incentives for sites to provide dual stack storage access.  
+
+\end{itemize}
+
+
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction}
+The WLCG is working under the assumption of flat cash funding for computing resources.  It is important that sites aren't hindered in their procurement by unnecessary restrictions from the WLCG VOs.  Hardware procurements often have a significant lead time and will often be in production for 5 years.  Even if a site does not intend to switch to IPv6 any time soon, they may well be making procurement decisions now.  
+
+This document describes the required steps to allow sites to provide IPv6 only CPU resources.  In order to provide CPU resources, a site also needs to provide other services such as CEs, Squids etc.  When this document refers to IPv6 only CPU resources it means not only the WN but all related services can be IPv6 only. 
+
+So as to not disadvantage sites that choose to deploy IPv6 only CPU resources, central services need to not only work with IPv6 but should provide the same level of service (e.g. resilience and performance).  Ideally the setup would be identical although if this is not possible the differences should be clearly documented.
+
+Each of the WLCG VOs operate some central services which are normally hosted at CERN.  CERN is already able to make these services dual stack.
+
+\section{Site Setup}
+In the current model, a site is expected to provide:
+
+\begin{itemize}
+\item Computer Element (CE): VOs submit their jobs to site CEs.  The role of a CE is to convert this job submission over the Grid into something that the local batch system understands.
+
+\item Squids:  For CVMFS and Frontier.
+
+\item Accounting: The number of jobs run is reported on a monthly basis to APEL.
+
+\item Information Provider: Site information is provided by the BDii, while usage of this service is dropping, it is still necessary for some functions.
+
+\end{itemize}
+
+
+\section{Storage}
+Virtually all jobs have output files.  If the output files are small they can be sent directly back to the user however for a large fraction of jobs the output files need to be uploaded to a Storage Element.  Sites need to be encouraged to provide a dual stack service.
+
+If a site can provide dual stack storage with $> 80\%$ availability for more than 3 months then they should get some kind of extra credit.
+
+
+
+\section{Shared services}
+\subsection{CVMFS}
+All the WLCG VO as well as many other distribute their software across the Grid using CVMFS. The software is uploaded to a Stratum 0 (located at CERN for the WLCG VOs) which then mirrors the data to several Stratum 1 servers.  Jobs will access the VO software from a cache on the local disk, if the file isn't there it will try and get it from a site squid, which in turn, will contact a Stratum 1.  We therefore request that all official Stratum 1s \cite{Stratum1} are made dual stack by April 2017.  Failure to make the service dual stack would result in a removal of the official 
+
+\subsection{PerfSonar}
+All Tier 1s were requested to provide a dual stack perfSonar box.  This request should be extended to all sites.
+
+\subsection{SAM tests}
+A separate IPv6 only SAM test infrastructure will need to be set up to monitor IPv6 ready sites.
+
+\subsection{Frontier Service}
+ATLAS and CMS both use the Frontier Service\cite{Frontier} to access Conditions data across the Grid.  Dave Dykstra is the main developer.  The Frontier service has 3 components:
+\begin{itemize}
+\item Frontier Client: This software is run by the ATLAS and CMS jobs.  It converts a conditions database query into an http request.  The Frontier Client was made IPV6 compliant in January 2016.
+
+\item Squid: Sites are expected to deploy squids to cache the conditions data requests.
+
+\item Frontier Launchpad: This converts the http requests back into database queries which are then submitted to the conditions database.
+
+\end{itemize}
+
+Both the Frontier client and the Frontier Launchpad will need to be made IPv6 complainant.  The Frontier Client is expected to be done by February 2016 with the launchpad following later in the year.
+
+\section{VO plans}
+The WLCG VO plans to allow CPU only sites are detailed below.  
+
+\subsection{ALICE}
+
+\subsection{ATLAS}
+The ATLAS workload management system is called PanDA \cite{Panda}.  Pilot factories generate pilot jobs which are sent directly to CEs at sites.  Once these pilots are started by the batch system, they will contact a central Panda Server to pull in a job (done via http).  They will also contact the Rucio Server for File lookup (done via http) and the local storage.  Some ATLAS jobs access Conditions data using the Frontier service. ATLAS jobs running on IPv6 WN will need access to the following resources:
+\begin{itemize}
+\item The production panda server nodes are aipanda03[0-7].cern.ch.
+
+\item The Rucio Authentication nodes: rucio-auth-prod-0[1,2].cern.ch
+
+\item The Rucio Production nodes: rucio-lb-prod-0[1-3].cern.ch
+
+\item The Frontier servers at CERN, IN2P3, RAL and Triumf.
+
+\end{itemize}  
+
+The pilot factories that submit jobs to CEs will also need to be made dual stack.  ATLAS also use the ARC Control Tower (aCT) to submit jobs primarily to NorduGrid but potentially any sites running an ARC CE.  This would also need to be made dual stack.
+
+
+\subsection{CMS}
+
+
+\subsection{LHCb}
+
+
+\section{Conclusion}
+
+
+\begin{thebibliography}{99}
+
+\bibitem{Panda} https://twiki.cern.ch/twiki/bin/view/PanDA/PanDA
+
+\bibitem{Stratum1} http://cernvm-monitor.cern.ch/cvmfs-monitor/atlas.cern.ch/
+
+\bibitem{Frontier} http://frontier.cern.ch/
+
+\end{thebibliography}
+
+\end{document}
