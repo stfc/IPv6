@@ -1,29 +1,20 @@
 documentclass[11pt]{article}
 \begin{document}
 
-\title{WLCG IPv6 only CPU deployment strategy}
+\title{WLCG IPv6 deployment strategy}
 \author{HEPiX IPv6 Working group}
 \date{\today}
 \maketitle
 
 \renewcommand{\abstractname}{Executive Summary}
 \begin{abstract}
-%With the continuing exhaustion of IPv4 addresses and the rising use of IPv6 across the globe it is important for the WLCG to have a plan to allow sites to migrate to IPv6.
-This document describes the Worldwide LHC Computing Grid's (WLCG) strategy to allow sites to provide IPv6 only CPU resources to the VOs.  
-
-
+This document describes the Worldwide LHC Computing Grid's (WLCG) strategy to allow sites to provide IPv6 resources to the LHC experiments. In summary:
 \begin{itemize}
-\item Sites can provide IPv6 only CPU resources from April 2017 onwards.
-
-\item Sites will not be required to provide dual stack interfaces (e.g. CEs and Squids) for their CPU resources.
-
-\item The VO infrastructure (e.g. central services provided by VOs) must provide an equal quality of service to both IPv4 and IPv6 resources.
-
-\item An IPv6 only CPU resource will need access to (dual stack) storage.  Several VOs have federated data access models.  We need to provide incentives for sites to provide dual stack storage access.  
-
+\item sites could provide IPv6-only CPU resources from April 2017 onwards if necessary
+\item sites could provide IPv6-only interfaces to their CPU resources, if necessary;
+\item the VO infrastructure (e.g. central services provided by VOs) must provide an equal quality of service to both IPv4 and IPv6 resources;
+\item sites should allow dual stack access to their storage resources, to allow remote access from IPv6-only resources.
 \end{itemize}
-
-
 \end{abstract}
 
 \newpage
@@ -31,63 +22,106 @@ This document describes the Worldwide LHC Computing Grid's (WLCG) strategy to al
 \newpage
 
 \section{Introduction}
-The WLCG is working under the assumption of flat cash funding for computing resources.  It is important that sites aren't hindered in their procurement by unnecessary restrictions from the WLCG VOs.  Hardware procurements often have a significant lead time and will often be in production for 5 years.  Even if a site does not intend to switch to IPv6 any time soon, they may well be making procurement decisions now.  
+Motivations to adopt IPv6 connectivity in WLCG are various. The most
+obvious is the exhaustion of the IPv4 address space, which is already
+putting constraints for some countries and institutions. Another
+motivation is that the WLCG is expected to evolve under the assumption
+of flat cash funding for computing resources. Therefore it is
+important that sites are not hindered in their procurement by
+unnecessary restrictions from the WLCG VOs. Hardware procurements
+often have a significant lead time and will often be in production for
+5 years.  Even if a site does not intend to switch to IPv6 any time
+soon, they may well be making procurement decisions now.
 
-This document describes the required steps to allow sites to provide IPv6 only CPU resources.  In order to provide CPU resources, a site also needs to provide other services such as CEs, Squids etc.  When this document refers to IPv6 only CPU resources it means not only the WN but all related services can be IPv6 only. 
+This document describes the required steps to allow existing and
+future sites and any opportunistic resource that may become available
+to provide IPv6-only CPU resources. In order to provide CPU resources,
+a site also needs to provide other services such as CEs, Squid caching
+proxies etc; for this reason, when this document refers to IPv6-only
+CPU resources it means not only the WN but all related services can be
+IPv6-only.
 
-So as to not disadvantage sites that choose to deploy IPv6 only CPU resources, central services need to not only work with IPv6 but should provide the same level of service (e.g. resilience and performance).  Ideally the setup would be identical although if this is not possible the differences should be clearly documented.
+In order not to penalise sites that choose to deploy IPv6-only CPU
+resources, central services need to not only work with IPv6 but should
+provide the same level of service (e.g. resilience and performance).
+Ideally the setup would be identical and in cases this is not possible
+the differences should be clearly documented.
 
-Each of the WLCG VOs operate some central services which are normally hosted at CERN.  CERN is already able to make these services dual stack.
+Each of the WLCG VOs operate some central services which are mostly
+hosted at CERN. CERN is already able to make these services dual
+stack.
+
+Finally, WLCG operates several central services, which should also be
+in dual stack.
 
 \section{Site Setup}
-In the current model, a site is expected to provide:
+In the current model, a site is expected to provide several services, shortly described in the following.
 
+\subsection{Compute}
 \begin{itemize}
-\item Computer Element (CE): VOs submit their jobs to site CEs.  The role of a CE is to convert this job submission over the Grid into something that the local batch system understands.
-
-\item Squids:  For CVMFS and Frontier.
-
-\item Accounting: The number of jobs run is reported on a monthly basis to APEL.
-
-\item Information Provider: Site information is provided by the BDii, while usage of this service is dropping, it is still necessary for some functions.
-
+\item Computer Element (CE): VOs submit their jobs to site CEs.  The
+  role of a CE is to convert this job submission over the Grid into
+  something that the local batch system understands.
+\item Squid proxies: they are used to cache requests from jobs to
+  CVMFS and Frontier.
+\item Accounting: The number and usage statistics of jobs run is
+  reported on a monthly basis to the APEL central service at RAL.
+\item Information Provider: Site information is provided by the BDII, while usage of this service is dropping, it is still necessary for some functions.
 \end{itemize}
 
-
 \section{Storage}
-Virtually all jobs have output files.  If the output files are small they can be sent directly back to the user however for a large fraction of jobs the output files need to be uploaded to a Storage Element.  Sites need to be encouraged to provide a dual stack service.
+Data read and written by jobs needs to be stored in Storage Elements
+(apart from small output files, that can be sent directly back to the
+submitter). VOs also often require for their data management of
+locally running agents which interact with some central service.
 
-If a site can provide dual stack storage with $> 80\%$ availability for more than 3 months then they should get some kind of extra credit.
+%Sites need to be encouraged to provide a dual stack service.
 
-
+%If a site can provide dual stack storage with $> 80\%$ availability for more than 3 months then they should get some kind of extra credit.
 
 \section{Shared services}
 \subsection{CVMFS}
-All the WLCG VO as well as many other distribute their software across the Grid using CVMFS. The software is uploaded to a Stratum 0 (located at CERN for the WLCG VOs) which then mirrors the data to several Stratum 1 servers.  Jobs will access the VO software from a cache on the local disk, if the file isn't there it will try and get it from a site squid, which in turn, will contact a Stratum 1.  We therefore request that all official Stratum 1s \cite{Stratum1} are made dual stack by April 2017.  Failure to make the service dual stack would result in a removal of the official 
+All the WLCG VOs as well as many others distribute their software
+across the Grid using CVMFS. The software is uploaded to a Stratum-0
+server (located at CERN for the WLCG VOs) which then mirrors the data
+to several Stratum-1 servers.  Jobs will access the VO software from a
+cache on the local disk; if the file is not available, it will be
+looked for in the site Squid server, which in turn, will contact a
+Stratum-1 if needed.  Therefore it is essential that all official
+Stratum-1s \cite{Stratum1} are made dual-stack by April 2017.
 
 \subsection{PerfSonar}
-All Tier 1s were requested to provide a dual stack perfSonar box.  This request should be extended to all sites.
+perfSonar instances are required at all WLCG sites to implement the
+network monitoring infrastructure. All Tier-1s were requested to
+provide a dual stack perfSonar box. This request should be extended
+to all sites, whenever possible.
 
 \subsection{SAM tests}
-A separate IPv6 only SAM test infrastructure will need to be set up to monitor IPv6 ready sites.
+A separate IPv6-only ETF test infrastructure will need to be set up to
+monitor IPv6-ready sites. The current ETF infrastructure should be run
+in dual-stack.
 
 \subsection{Frontier Service}
-ATLAS and CMS both use the Frontier Service\cite{Frontier} to access Conditions data across the Grid.  Dave Dykstra is the main developer.  The Frontier service has 3 components:
+ATLAS and CMS both use the Frontier Service\cite{Frontier} to access
+conditions data across the Grid. The Frontier service has three
+components:
 \begin{itemize}
-\item Frontier Client: This software is run by the ATLAS and CMS jobs.  It converts a conditions database query into an http request.  The Frontier Client was made IPV6 compliant in January 2016.
-
-\item Squid: Sites are expected to deploy squids to cache the conditions data requests.
-
-\item Frontier Launchpad: This converts the http requests back into database queries which are then submitted to the conditions database.
-
+\item the Frontier client: this software is run by ATLAS and CMS
+  jobs. It converts a conditions database query into an HTTP request.
+  The Frontier Client was made IPV6 compliant in January 2016.
+\item Squid proxy: sites are expected to deploy squid servers to cache
+  the conditions data requests. At the moment of writing, the latest
+  version of Squid is not fully IPv6-compatible.
+\item Frontier Launchpad: this converts the HTTP requests back into
+  database queries which are then submitted to the conditions
+  database.
 \end{itemize}
 
-Both the Frontier client and the Frontier Launchpad will need to be made IPv6 complainant.  The Frontier Client is expected to be done by February 2016 with the launchpad following later in the year.
-
-\section{VO plans}
+\section{Experiment plans}
 The WLCG VO plans to allow CPU only sites are detailed below.  
 
 \subsection{ALICE}
+\emph{To be written...}
 
 \subsection{ATLAS}
 The ATLAS workload management system is called PanDA \cite{Panda}.  Pilot factories generate pilot jobs which are sent directly to CEs at sites.  Once these pilots are started by the batch system, they will contact a central Panda Server to pull in a job (done via http).  They will also contact the Rucio Server for File lookup (done via http) and the local storage.  Some ATLAS jobs access Conditions data using the Frontier service. ATLAS jobs running on IPv6 WN will need access to the following resources:
@@ -106,7 +140,85 @@ The pilot factories that submit jobs to CEs will also need to be made dual stack
 
 
 \subsection{CMS}
+\subsubsection{Goals}
+The priority for CMS is to firstly enable the exploitation of IPv6-only opportunistic resources, and allow sites to expand their capacity using IPv6-only worker nodes. Secondly, sites should be able to adopt IPv6 for performance reasons.
 
+Having said that, CMS strongly recommends sites not to switch off their IPv4 networking until the end of Run II, as a safety net.
+
+\subsubsection{IPv6 Readiness}
+At the time of writing, only eleven CMS sites expose IPv6 addresses
+for their services. This is proven not to create any problem, either
+in the ETF tests or for real production or analysis jobs. This should
+be taken into account by sites that need to evaluate the risks of
+deploying IPv6 in production.
+
+Concerning AAA, the CMS storage federation, only a very small fraction
+of the data is accessible using xrootd or GridFTP via IPv6. The global
+and regional redirectors are only partly on dual stack.
+
+The job submission middleware, glideinWMS, has been validated for IPv6
+and some glidein factories are already in dual stack. The CMS-specific
+job management systems (WMAgent for production and CRAB3 for analysis)
+have not yet been fully tested on IPv6, but they are expected to work
+with little effort needed.
+
+The central services hub, cmsweb.cern.ch, is in dual stack.
+
+The data management system, PhEDEx, uses the Oracle client for
+communication between local site agents and the central service. Tests
+have not yet been done, but Oracle 12c fully supports IPv6.
+
+Frontier, as said before, is not yet fully compliant with IPv6 due to
+issues in the Squid software, which are expected to be solved in a
+time scale of weeks.
+
+\subsubsection{CMS messages to WLCG sites}
+Sites are free to upgrade WNs and services to dual-stack according to
+their internal plans, provided that they continue to pass ETF tests.
+
+In particular, sites are encouraged to upgrade to dual-stack if this
+improves their networking connectivity.
+
+On the other hand, sites should retain their IPv4 connectivity until
+the end of Run II, even in a degraded form, as a form of precaution.
+
+Priority should be given to dual stack the site storage services, as
+this allows data access from IPv6-only resources. This process should
+start immediately and by the end of Run II a large fraction of the CMS
+data should be accessible via IPv6.
+
+\subsubsection{CMS messages to CMS service maintainers}
+Internally to the CMS collaboration, services should immediately start
+upgrading to dual stack, according to what makes sense for their
+operations teams. This request is particularly relevant for services
+contacted by worker nodes. The process of enabling dual stack must be
+completed by the end of Run II.
+
+As an example, HTCondor is expected to gain performance benefits from
+using IPv6: as currently a dozen TCP connections need to be maintained
+with each single-core glidein, today they can cause significant pressure on
+NATs.
+
+\subsubsection{CMS messages to WLCG}
+In summary, CMS is close to be IPv6-ready. The only area showing
+significant limitations is the data accessibility via IPv6. To
+overcome this limitation, new data access and distribution strategies
+will be needed, to move data around until it becomes accessible by any
+IPv6-only CPU resources that need it.
+
+CMS encourages WLCG-run services to discuss with CMS when to enable
+IPv6 support, and WLCG should encourage its constituent grids (OSG,
+EGI, NorduGRID) to enable IPv6 on their services as soon as possible.
+
+The most important services yet to dual-stack are (in order of
+importance):
+\begin{itemize}
+\item FTS
+\item CVMFS
+\item VOMS
+\item PhEDEx
+\item Oracle database
+\end{itemize}
 
 \subsection{LHCb}
 
