@@ -1,0 +1,16 @@
+from ipaddress import IPv4Network
+
+NAMESERVER = 'ns0.example.org'
+
+DOMAINS = ['example.org', 'example.com']
+
+SUBNET_PREFIXES = {
+    'wan' : '2001:db8:feed:2000',
+    'dmz' : '2001:db8:feed:2020',
+}
+
+SUBNETS_IPV4 = {
+    IPv4Network('192.0.2.0/24') : 'wan',
+    IPv4Network('198.51.100.0/24') : 'wan',
+    IPv4Network('203.0.113.0/24') : 'dmz',
+}
