@@ -33,17 +33,13 @@ def process_zone(zone, f_fwd, f_rev):
 
 
 def main():
-    zones = []
-
     for domain in DOMAINS:
         zone = check_output(['dig', '@'+NAMESERVER, domain, 'axfr'])
         zone = zone.decode()
         zone = [l.strip().split() for l in zone.split(u'\n')]
-        zones.append(zone)
 
-    with open('forward.zone', 'w') as f_fwd:
-        with open('reverse.zone', 'w') as f_rev:
-            for zone in zones:
+        with open('%s.forward.zone' % domain, 'w') as f_fwd:
+            with open('%s.reverse.zone' % domain, 'w') as f_rev:
                 process_zone(zone, f_fwd, f_rev)
 
 
