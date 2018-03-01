@@ -7,13 +7,20 @@ from ipaddress import IPv4Address, IPv6Address
 
 from config import *
 
+def scd_mapped_ipv4v6(ip4, ip6_subnet_prefix):
+    ip6 = [int(o) for o in str(ip4).split('.')]
+    if len(ip6) == 4:
+        ip6 = ip6_subnet_prefix + ('::%02x%02x:%02x%02x' % tuple(ip6))
+        return IPv6Address(ip6)
+    return None
+
+
 def process_zone(zone, f_fwd, f_rev):
     for r in zone:
         if len(r) == 5:
             z_name, z_ttl, z_class, z_type, z_ip4 = r
             if z_type == 'A' and z_class == 'IN':
                 ip4 = IPv4Address(z_ip4)
-                z_type = 'AAAA'
 
                 subnet_prefix = None
 
@@ -22,11 +29,10 @@ def process_zone(zone, f_fwd, f_rev):
                         subnet_prefix = SUBNET_PREFIXES[realm]
 
                 if subnet_prefix:
-                    z_ip6 = [int(o) for o in z_ip4.split('.')]
-                    z_ip6 = subnet_prefix + ('::%02x%02x:%02x%02x' % tuple(z_ip6))
-                    f_fwd.write('%s\t%s\t%s\t%s\t\t%s\n' % (z_name, z_type, z_class, z_ttl, z_ip6))
+                    # resource record format : name, ttl, class, type, data
+                    ip6 = scd_mapped_ipv4v6(ip4, subnet_prefix)
+                    f_fwd.write('%s\t%s\tIN\tAAAA\t%s\n' % (z_name, z_ttl, ip6))
 
-                    ip6 = IPv6Address(z_ip6)
                     rev6 = ip6.reverse_pointer
 
                     f_rev.write('%s\t%s\tIN\tPTR\t%s\n' % (rev6, z_ttl, z_name))
